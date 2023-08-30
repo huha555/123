@@ -12,7 +12,7 @@
     ],
     "autoload": {
         "psr-4": {
-            "14628\\WechatPay\\": "src/",
+            "Wzb\\WechatPay\\": "src/",
             "WeChatPay\\" : "src/"
         }
     },
