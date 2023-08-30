@@ -43,5 +43,6 @@
     },
     "scripts": {
         "v3-certificates": "bin/CertificateDownloader.php"
-    }
+    },
+    "license": "MIT"
 }
