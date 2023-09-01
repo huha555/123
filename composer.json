@@ -44,5 +44,12 @@
     "scripts": {
         "v3-certificates": "bin/CertificateDownloader.php"
     },
-    "license": "MIT"
+    "license": "MIT",
+    "extra": {
+        "laravel": {
+            "aliases": {
+                "ExceptionFactory": "Wzb\\Wechatpay\\Exception\\ExceptionFactoryFacade"
+            }
+        }
+    }
 }

@@ -14,17 +14,17 @@ class BaseService
     public function baseConfig()
     {
         // 商户号
-        $merchantId = config('pay.merchant_id');
+        $merchantId = env('WECHAT_PAY_MERCHANT_ID');
 
         // 从本地文件中加载「商户API私钥」，「商户API私钥」会用来生成请求的签名
-        $merchantPrivateKeyFilePath = config('pay.merchant_private_key_file_path');
+        $merchantPrivateKeyFilePath = env('MERCHANT_PRIVATE_KEY_FILE_PATH');
         $merchantPrivateKeyInstance = Rsa::from($merchantPrivateKeyFilePath, Rsa::KEY_TYPE_PRIVATE);
 
         // 「商户API证书」的「证书序列号」
-        $merchantCertificateSerial = config('pay.merchant_certificate_serial');
+        $merchantCertificateSerial = env('WECHAT_PAY_MERCHANT_CERTIFICATE_SERIAL');
 
         // 从本地文件中加载「微信支付平台证书」，用来验证微信支付应答的签名
-        $platformCertificateFilePath = config('pay.platform_certificate_file_path');
+        $platformCertificateFilePath = env('PLATFORM_CERTIFICATE_FILE_PATH');
         $platformPublicKeyInstance = Rsa::from($platformCertificateFilePath, Rsa::KEY_TYPE_PUBLIC);
 
         // 从「微信支付平台证书」中获取「证书序列号」
