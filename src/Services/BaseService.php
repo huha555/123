@@ -2,12 +2,14 @@
 
 namespace Wzb\WechatPay\Services;
 
+use WeChatPay\Builder;
 use WeChatPay\Crypto\Rsa;
 
 use GuzzleHttp\Exception\RequestException;
-use WechatPay\GuzzleMiddleware\WechatPayMiddleware;
-use WechatPay\GuzzleMiddleware\Util\PemUtil;
+use WeChatPay\GuzzleMiddleware\WechatPayMiddleware;
 use GuzzleHttp\HandlerStack;
+use WeChatPay\Util\PemUtil;
+
 
 class BaseService
 {
@@ -17,14 +19,14 @@ class BaseService
         $merchantId = env('WECHAT_PAY_MERCHANT_ID');
 
         // 从本地文件中加载「商户API私钥」，「商户API私钥」会用来生成请求的签名
-        $merchantPrivateKeyFilePath = env('MERCHANT_PRIVATE_KEY_FILE_PATH');
+        $merchantPrivateKeyFilePath = env('WECHAT_MERCHANT_PRIVATE_KEY_FILE_PATH');
         $merchantPrivateKeyInstance = Rsa::from($merchantPrivateKeyFilePath, Rsa::KEY_TYPE_PRIVATE);
 
         // 「商户API证书」的「证书序列号」
         $merchantCertificateSerial = env('WECHAT_PAY_MERCHANT_CERTIFICATE_SERIAL');
 
         // 从本地文件中加载「微信支付平台证书」，用来验证微信支付应答的签名
-        $platformCertificateFilePath = env('PLATFORM_CERTIFICATE_FILE_PATH');
+        $platformCertificateFilePath = env('WECHAT_PLATFORM_CERTIFICATE_FILE_PATH');
         $platformPublicKeyInstance = Rsa::from($platformCertificateFilePath, Rsa::KEY_TYPE_PUBLIC);
 
         // 从「微信支付平台证书」中获取「证书序列号」
@@ -38,6 +40,7 @@ class BaseService
             'certs'      => [
                 $platformCertificateSerial => $platformPublicKeyInstance,
             ],
+            'verify'     => false
         ]);
 
         // 发送请求

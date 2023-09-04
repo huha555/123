@@ -87,6 +87,7 @@ class CertificateDownloader
             'privateKey' => \file_get_contents((string)$opts['privatekey']),
             'certs'      => &$certs,
             'base_uri'   => (string)($opts['baseuri'] ?? self::DEFAULT_BASE_URI),
+            'verify'     => false,
         ]);
 
         /** @var \GuzzleHttp\HandlerStack $stack */

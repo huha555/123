@@ -12,7 +12,7 @@ class WechatService extends BaseService
 
     public function __construct()
     {
-//        $this->instance = $this->baseConfig();
+        $this->instance = $this->baseConfig();
     }
 
     /**
@@ -29,12 +29,14 @@ class WechatService extends BaseService
         if ($total <= 0) {
             throw new InvalidArgumentException('总金额必须大于0元');
         }
-        try {
+
+//        try {
             $resp = $this->instance
                 ->chain('v3/pay/transactions/jsapi')
                 ->post(['json' => [
-                    'mchid' => env('MCH_ID'),//直连商户号
-                    'appid' => env('APP_ID'),//应用ID
+                   'mchid' => env('WECHAT_MCH_ID'),//直连商户号
+                    'appid' => env('WECHAT_PAY_APP_ID'),//应用ID
+
                     'out_trade_no' => $out_trade_no,//商户订单号
                     'description' => $description,//商品描述
                     'notify_url' => env('PAY_NOTIFY_URL'),//通知地址
@@ -48,6 +50,8 @@ class WechatService extends BaseService
                 ]]);
 
 
+dd($resp);
+
 //            // 对待签名字符串进行 SHA256 with RSA 签名
 //            openssl_sign($signString, $signature, $privateKey, OPENSSL_ALGO_SHA256);
 //
@@ -57,16 +61,19 @@ class WechatService extends BaseService
 
             echo $resp->getStatusCode(), PHP_EOL;
             echo $resp->getBody(), PHP_EOL;
-        } catch (\Exception $e) {
-            // 进行错误处理
-            echo $e->getMessage(), PHP_EOL;
-            if ($e instanceof \GuzzleHttp\Exception\RequestException && $e->hasResponse()) {
-                $r = $e->getResponse();
-                echo $r->getStatusCode() . ' ' . $r->getReasonPhrase(), PHP_EOL;
-                echo $r->getBody(), PHP_EOL, PHP_EOL, PHP_EOL;
-            }
-            echo $e->getTraceAsString(), PHP_EOL;
-        }
+
+
+//        } catch (\Exception $e) {
+//            // 进行错误处理
+//            echo $e->getMessage(), PHP_EOL;
+//            if ($e instanceof \GuzzleHttp\Exception\RequestException && $e->hasResponse()) {
+//                $r = $e->getResponse();
+//                echo $r->getStatusCode() . ' ' . $r->getReasonPhrase(), PHP_EOL;
+//                echo $r->getBody(), PHP_EOL, PHP_EOL, PHP_EOL;
+//            }
+//            echo $e->getTraceAsString(), PHP_EOL;
+//        }
+
     }
 
     /**
@@ -83,7 +90,7 @@ class WechatService extends BaseService
                 ->v3->pay->transactions->id->_transaction_id_
                 ->getAsync([
                     'query' => [
-                        'mchid' => env('MCH_ID')//直连商户号
+                        'mchid' => env('WECHAT_MCH_ID')//直连商户号
                     ],
                     'transaction_id' => $transaction_id,//微信支付订单号
                 ]);
@@ -117,7 +124,7 @@ class WechatService extends BaseService
                 ->v3->pay->transactions->outTradeNo->_out_trade_no_
                 ->getAsync([
                     'query' => [
-                        'mchid' => env('MCH_ID')//直连商户号
+                        'mchid' => env('WECHAT_MCH_ID')//直连商户号
                     ],
                     'out_trade_no' => $out_trade_no,//商户订单号
                 ]);
@@ -152,7 +159,8 @@ class WechatService extends BaseService
                 ->postAsync([
                     // 请求消息
                     'json' => [
-                        'mchid' => env('MCH_ID')//直连商户号
+
+                        'mchid' => env('WECHAT_MCH_ID')//直连商户号
                     ],
                     'out_trade_no' => $out_trade_no,//商户订单号
                 ]);
@@ -310,6 +318,7 @@ class WechatService extends BaseService
             echo $e->getTraceAsString(), PHP_EOL;
         }
     }
+
     /**
      * FunctionName：DownloadBills
      * Description：下载账单
@@ -360,11 +369,13 @@ class WechatService extends BaseService
          * @$money  金额
          * @$openid  用户微信的openid
         */
-    public function wechartAddOrder($name, $ordernumber, $money, $openid)
+
+    public function wechartAddOrder($description, $ordernumber, $money, $openid)
     {
-        $appid = env('WECHAT.appid'); // 微信APPID
-        $mchid = env('WECHAT.mch_id'); // 商户号
-        $xlid = env('WECHAT.serial_number');//API序列号
+        $appid = env('WECHAT_PAY_APP_ID'); // 微信APPID
+        $mchid = env('WECHAT_MCH_ID'); // 商户号
+        $xlid = env('WECHAT_PAY_MERCHANT_CERTIFICATE_SERIAL');//证书序列号
+
 
         $out_trade_no = order_id();//生成支付单号（和订单号不一样）这样做是保证同一个订单可以被多次进行支付，因为每次支付单号不一样
         $url = "https://api.mch.weixin.qq.com/v3/pay/transactions/jsapi";
@@ -374,7 +385,8 @@ class WechatService extends BaseService
         $time = time();
         $data['appid'] = $appid;
         $data['mchid'] = $mchid;
-        $data['description'] = $name;//商品描述
+
+        $data['description'] = $description;//商品描述
         $data['attach'] = $ordernumber;//订单编号
         $data['out_trade_no'] = $out_trade_no;//支付订单编号
         $data['notify_url'] = "";//回调接口
